@@ -1,13 +1,14 @@
-from django.contrib.auth.decorators import login_required
+import os
+
 import weasyprint
-
 from django.contrib import messages
-from django.http import HttpResponse
-from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
 from django.core import mail
+from django.http import HttpResponse
+from django.shortcuts import redirect, render
 
-from qoutes.models import Qoute, QouteProductDetail, Emails
-from qoutes.forms import QoutesForm, QouteProductDetailForm
+from qoutes.forms import QouteProductDetailForm, QoutesForm
+from qoutes.models import Emails, Qoute, QouteProductDetail
 
 
 def get_pdf(request, pk):
@@ -34,11 +35,11 @@ def send_email_view(request, pk):
     """
 
     pdf = get_pdf(request, pk)
-    reciver = 'parsyab1@gmail.com'
+    reciver = os.environ.get('EMAIL_HOST_USER')
     # response = HttpResponse(pdf, content_type='application/pdf')
     email = mail.EmailMessage(
         subject='پیش فاکتور',
-        from_email='parsyab1@gmail.com',
+        from_email=os.environ.get('EMAIL_HOST_USER'),
         body="پیش فاکتور محصولات",
         to=[reciver]
     )
