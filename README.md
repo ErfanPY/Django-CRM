@@ -1,4 +1,4 @@
-# Customer relation management using Django.
+# Customer relation management using Django
 
 ### Description:
 CRM tools that provide the following features:
