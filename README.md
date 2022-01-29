@@ -17,7 +17,7 @@ ___
 
 ___
 ### Usage:
-## Deploy with docker:
+Deploy with docker:
 ```sh
 docker-compose up
 ```
