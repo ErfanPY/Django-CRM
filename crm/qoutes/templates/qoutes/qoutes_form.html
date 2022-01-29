@@ -1,0 +1,132 @@
+{% extends 'web/base.html' %}
+{% load widget_tweaks %}
+{% block page_header_title %}
+    {{ page_title }}
+{% endblock %}
+{% block content %}
+    <div class="col-8">
+        <h3>{{ page_title }}</h3>
+        <form id="qoutesForm" method="{{ form_method }}" enctype="multipart/form-data" action="{{ form_action }}">
+            {% csrf_token %}
+            <div class="form-group">
+                {% render_field form.creator class="form-control" placeholder=form.creator.label %}
+            </div>
+            
+            <div class="form-group">
+                {% render_field form.organization class="form-control" placeholder=form.organization.label %}
+            </div>
+           
+        </form>
+        <div id="productsForms">
+        </div>
+        <div class="row justify-content-between">
+            <button id="submitButton" class="btn btn-primary"> Save</button>
+            <button id="addButton" class="btn btn-primary">ADD</button>
+        </div>
+    </div>
+    <div id="productFormTemple" hidden>
+        <form class="productForm" method="{{ form_method }}" enctype="multipart/form-data" action="{{ product_form_action }}">
+            {% csrf_token %}
+            <div class="row">
+                <div class="form-group col-3">
+                    {% render_field product_form.discount_percent class="form-control" placeholder=product_form.discount_percent.label %}
+                </div>
+                <div class="form-group col-3">
+                    {% render_field product_form.price class="form-control" placeholder=product_form.price.label %}
+                </div>
+                <div class="form-group col-2">
+                    {% render_field product_form.qty class="form-control" placeholder=product_form.qty.label %}
+                </div>
+                <div class="form-group col-3">
+                    {% render_field product_form.product class="form-control" placeholder=product_form.product.label %}
+                </div>
+                <div hidden>
+                    {% render_field product_form.qoute %}
+                </div>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close" onclick="$(this).parent().parent().remove()">
+                    &times;
+                </button>
+            </div>
+        </form>
+    </div>
+    <script>
+        var qoute_pk = 1;
+
+        $( document ).ready(function() {
+            $('#productsForms').append($("#productFormTemple .productForm").clone())
+        });
+        $('button#addButton').click( function() {
+            $('#productsForms').append($("#productFormTemple .productForm").clone())
+        })
+        $('button#submitButton').click( function() {
+
+            var form = $('form#qoutesForm');
+            var $crf_token = $('[name="csrfmiddlewaretoken"]').attr('value');
+
+            $.ajax({
+                type: form.attr('method'),
+                url: form.attr('action'),
+                data: form.serialize(),
+                headers:{"X-CSRFToken": $crf_token},
+                error: 
+                    function(data) {
+                        alert(data['responseText'])
+                        console.log(data)
+
+                    },
+                success: 
+                    function(data) {
+                        console.log("Added Qoute")
+
+                        qoute_pk = data['pk']
+                        $('.productForm #id_qoute').val(qoute_pk)
+                        var success_message = 
+                            `<div class="alert alert-success alert-dismissible">
+                                {{ success_message }}
+                                <button type="button" data-dismiss="alert" class="close">&times;</button>
+                            </div>`
+                        if (form.attr('method') == "POST" ) {
+                            $('form#qoutesForm')[0].reset();
+                            console.log("CLEAR PRODUCTS")
+                        }
+                        $('#messages').append(success_message)
+                        
+                        send_products()
+                    },
+            });
+            
+            function send_products() {
+                console.log("Sent Products")
+                $('#productsForms form').each(function(index, value) {
+                    var product_form = $(this);
+
+                    $.ajax({
+                        type: product_form.attr('method'),
+                        url: product_form.attr('action'),
+                        data: product_form.serialize(),
+                        headers:{"X-CSRFToken": $crf_token},
+                        error: 
+                            function(data) {
+                                alert(data['responseText'])
+                                console.log(data)
+                                var success_message = 
+                                    `<div class="alert alert-danger alert-dismissible">
+                                        {{ product_error_message }}
+                                        <button type="button" data-dismiss="alert" class="close">&times;</button>
+                                    </div>`
+                                $('#messages').append(success_message)
+                                
+                            },
+                        success: 
+                            function(data) {
+                                console.log(`ADDED product:> ${index}: ${this.id}`)                           
+                            },
+                    });
+
+                });
+            }
+           
+
+        });
+    </script>
+{% endblock %}

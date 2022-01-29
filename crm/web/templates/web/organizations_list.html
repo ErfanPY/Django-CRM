@@ -1,0 +1,54 @@
+{% extends 'web/base.html' %}
+{% block page_header_title %}
+    {{ page_title }}
+{% endblock %}
+{% block content %}
+    <div class="col-8">
+        <h3>{{ page_title }}</h3>
+        <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">نام سازمان</th>
+                <th scope="col">ثبت کننده</th>
+                <th scope="col">مخاطب</th>
+                <th scope="col">عملیات</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+    </div>
+    <script>
+
+        $( document ).ready(function() {
+            $.ajax({
+                url: "http://127.0.0.1:8000/organizations/api/",
+                headers: {
+                    "Accept":"application/json"
+                },
+                error: 
+                    function(data) {
+                        alert("ERROR")
+                        console.log(data)
+                    },
+                success: 
+                    update_table,
+            });
+        });
+        function update_table(data) {
+            for (const organizations_index in data['results']) {
+                var organizations = data['results'][organizations_index]
+                var row = 
+                `<tr>
+                    <th scope="row">${Number(organizations_index)+1}</th>
+                    <td><a href="/organizations/edit/${organizations['pk']}/">${organizations['name']}</a></td>
+                    <td>${organizations['registrar_name']}</td>
+                    <td>${organizations['contact_fullname']}</td>
+                    <td><a href="#"> ثبت پیگیری </a></td>
+                </tr>`
+                $("tbody").append(row)
+            }
+        }
+    </script>
+{% endblock %}

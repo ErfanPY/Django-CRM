@@ -1,0 +1,42 @@
+version: '3'
+volumes:
+  CRMDbData:
+services:
+  database:
+    image: "postgres:10-alpine"
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_NAME=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+
+  broker:
+    image: "rabbitmq:alpine"
+    hostname: 'msg_broker'
+    # ports:
+    #   - 5672:5672
+
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    environment:
+      - POSTGRES_NAME=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    depends_on:
+      - database
+    # ports:
+    #   - 5432:5432
+    # environment:
+    #   POSTGRES_USER: usr_crm
+    #   POSTGRES_PASSWORD: 123456
+    #   PGPASSWORD: 123456
+    #   POSTGRES_DB: crm_db
+    #   PGDATA: /db_data
+    # volumes:
+    #   - CRMDbData:/db_data

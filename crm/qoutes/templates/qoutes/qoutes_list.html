@@ -1,0 +1,60 @@
+{% extends 'web/base.html' %}
+{% block page_header_title %}
+    {{ page_title }}
+{% endblock %}
+{% block content %}
+    <div class="col-8">
+        <h3>{{ page_title }}</h3>
+        <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">نام مشتری</th>
+                <th scope="col">دستگاه ها</th>
+                <th scope="col">مبلغ نهایی</th>
+                <th scope="col">PDF</th>
+                <th scope="col">عملیات</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+    </div>
+    <script>
+
+        $( document ).ready(function() {
+            $.ajax({
+                url: "http://127.0.0.1:8000/qoutes/api/qoute",
+                headers: {
+                    "Accept":"application/json"
+                },
+                error: 
+                    function(data) {
+                        alert("ERROR")
+                        console.log(data)
+                    },
+                success: 
+                    update_table,
+            });
+        });
+        function update_table(data) {
+            console.log(data)
+            for (const qoutes_index in data['results']) {
+                var qoute = data['results'][qoutes_index]
+                
+                var row = 
+                `<tr>
+                    <th scope="row">${Number(qoutes_index)+1}</th>
+                    <td>${qoute['organization_name']}</td>
+                    <td>${qoute['products_text']}</td>
+                    <td>${qoute['total_products_price']}</td>
+                    <td><a href="http://127.0.0.1:8000/qoutes/pdf/${qoute['pk']}"> 
+                        <i class="fa fa-download"></i>
+                    </a></td>
+                    <td><a href="http://127.0.0.1:8000/qoutes/send_email/${qoute['pk']}"> ارسال ایمیل با ایمیل </a></td>
+                </tr>`
+                $("tbody").append(row)
+            }
+        }
+    </script>
+{% endblock %}

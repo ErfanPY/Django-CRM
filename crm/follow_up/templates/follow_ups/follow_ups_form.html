@@ -1,0 +1,61 @@
+{% extends 'web/base.html' %}
+{% load widget_tweaks %}
+{% block page_header_title %}
+    {{ page_title }}
+{% endblock %}
+{% block content %}
+    <div class="col-8">
+        <h3>{{ page_title }}</h3>
+        <form id="follow_upsForm" method="{{ form_method }}" enctype="multipart/form-data" action="{{ form_action }}">
+            {% csrf_token %}
+            <div class="form-group">
+                {% render_field form.creator class="form-control" placeholder=form.creator.label %}
+            </div>
+            
+            <div class="form-group">
+                {% render_field form.organization class="form-control" placeholder=form.organization.label %}
+            </div>
+            
+            <div class="form-group">
+                {% render_field form.text class="form-control" placeholder=form.text.label %}
+            </div>
+           
+        </form>
+        <div class="row justify-content-between">
+            <button id="submitButton" class="btn btn-primary"> Save</button>
+        </div>
+    </div>
+    <script>
+        $('button#submitButton').click( function() {
+
+            var form = $('form#follow_upsForm');
+            var $crf_token = $('[name="csrfmiddlewaretoken"]').attr('value');
+
+            $.ajax({
+                type: form.attr('method'),
+                url: form.attr('action'),
+                data: form.serialize(),
+                headers:{"X-CSRFToken": $crf_token},
+                error: 
+                    function(data) {
+                        alert(data['responseText'])
+                        console.log(data)
+
+                    },
+                success: 
+                    function(data) {
+                        console.log("Added Follow Up")
+
+                        var success_message = 
+                            `<div class="alert alert-success alert-dismissible">
+                                {{ success_message }}
+                                <button type="button" data-dismiss="alert" class="close">&times;</button>
+                            </div>`
+                        $('#messages').append(success_message)
+                        
+                    },
+            });
+            
+        });
+    </script>
+{% endblock %}

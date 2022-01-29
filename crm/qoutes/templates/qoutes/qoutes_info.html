@@ -1,0 +1,42 @@
+<dl>
+    <dt>نام ارگان</dt>
+    <dd>{{ qoute.organization.name }}</dd>
+    <dt>کارشناس فروش</dt>
+    <dd>{{ qoute.creator.username }}</dd>
+</dl>
+<table>
+    <thead>
+    <tr>
+        <th>ردیف</th>
+        <th>نام کالا</th>
+        <th>تعداد</th>
+        <th>قیمت</th>
+        <th>تخفیف</th>
+        <th>جمع</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for qouteProduct in qouteProducts %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ qouteProduct.prodcut.name }}</td>
+            <td>{{ qouteProduct.qty }}</td>
+            <td>{{ qouteProduct.price }} ریال</td>
+            <td>{{ qouteProduct.discount_percent }}</td>
+            <td>{{ qouteProduct.calculate_total_price }} ریال</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+    <tfoot>
+    <tr>
+        <td colspan="3">
+            {{ qoute.get_total_qty }}
+        </td>
+        <td colspan="2">
+            مبلغ قابل پرداخت:
+            {{ qoute.get_total_products_price }}
+            ریال
+        </td>
+    </tr>
+    </tfoot>
+</table>
